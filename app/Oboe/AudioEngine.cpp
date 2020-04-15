@@ -72,7 +72,7 @@ aaudio_result_t AudioEngine::CreateAndOpenStream() {
     AAudioStreamBuilder_setDirection(builder, AAUDIO_DIRECTION_OUTPUT);
     AAudioStreamBuilder_setSharingMode(builder, AAUDIO_SHARING_MODE_SHARED);
     AAudioStreamBuilder_setSampleRate(builder, sampleRate);
-    AAudioStreamBuilder_setBufferCapacityInFrames(builder, BufferCapacityInFrames);
+    AAudioStreamBuilder_setBufferCapacityInFrames(builder, BufferCapacityInFrames*4096);
     AAudioStreamBuilder_setChannelCount(builder, channelCount);
     AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
     AAudioStreamBuilder_setDataCallback(builder, onAudioReady, this);
@@ -85,11 +85,6 @@ aaudio_result_t AudioEngine::CreateAndOpenStream() {
     framesPerBurst = AAudioStream_getFramesPerBurst(stream);
     bufferSize = AAudioStream_getBufferSizeInFrames(stream);
     bufferCapacity = AAudioStream_getBufferCapacityInFrames(stream);
-    underrunMonitor.add("underrunCount", &underrunCount);
-    underrunMonitor.add("previousUnderrunCount", &previousUnderrunCount);
-    underrunMonitor.add("framesPerBurst", &framesPerBurst);
-    underrunMonitor.add("bufferSize", &bufferSize);
-    underrunMonitor.add("bufferCapacity", &bufferCapacity);
     return result;
 }
 

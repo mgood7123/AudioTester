@@ -1,19 +1,11 @@
 package general.code.audiotester
 
 import android.os.Bundle
-import android.os.Handler
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.doOnPreDraw
 import liblayout.Builder
 
 class MainActivity : AppCompatActivity() {
     var player: MP? = null
-    lateinit var underruns: TextView
-    lateinit var previousunderruns: TextView
-    lateinit var framesperburst: TextView
-    lateinit var buffersize: TextView
-    lateinit var buffercapacity: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,16 +18,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     it.addOnDrawAction {
                         it.text = "underruns: ${player!!.Oboe_underrunCount()}"
-                    }
-                }
-            }
-            .row().column {
-                UpdatingTextView(this).also {
-                    it.addOnFirstDrawAction {
-                        it.text = "previous underruns: 0"
-                    }
-                    it.addOnDrawAction {
-                        it.text = "previous underruns: ${player!!.Oboe_previousUnderrunCount()}"
                     }
                 }
             }
@@ -69,6 +51,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "frame bursts in buffer: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "frame bursts in buffer: ${
+                            player!!.Oboe_bufferCapacity() / player!!.Oboe_framesPerBurst()
+                        }"
+                    }
+                }
+            }
+
         .build()
 
         // load Player
