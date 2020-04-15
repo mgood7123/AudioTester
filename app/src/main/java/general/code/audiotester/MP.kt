@@ -23,6 +23,12 @@ class MP (private val activity: Activity) {
     private external fun Oboe_SampleRate(): Int
     private external fun Oboe_ChannelCount(): Int
 
+    external fun Oboe_underrunCount(): Int
+    external fun Oboe_previousUnderrunCount(): Int
+    external fun Oboe_framesPerBurst(): Int
+    external fun Oboe_bufferSize(): Int
+    external fun Oboe_bufferCapacity(): Int
+
     val LOG_TAG = "AUDIO_TESTER_APK"
 
     lateinit var currentTemporyMediaFilesDirectory: String

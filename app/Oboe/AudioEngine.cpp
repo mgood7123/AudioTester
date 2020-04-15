@@ -15,7 +15,19 @@ extern AudioEngine AudioEngine;
 aaudio_data_callback_result_t AudioEngine::onAudioReady(
         AAudioStream *stream, void *userData, void *audioData, int32_t numFrames
 ) {
+    AudioEngine * AE = static_cast<AudioEngine *>(userData);
     Mixer.renderAudio(static_cast<int16_t *>(audioData), numFrames);
+
+    // Are we getting underruns?
+    int32_t tmpuc = AAudioStream_getXRunCount(stream);
+    LOGE("UNDERRUN COUNT: %d", tmpuc);
+    if (tmpuc > AE->previousUnderrunCount) {
+        AE->previousUnderrunCount = AE->underrunCount;
+        AE->underrunCount = tmpuc;
+        // Try increasing the buffer size by one burst
+        AE->bufferSize += AE->framesPerBurst;
+        AE->bufferSize = AAudioStream_setBufferSizeInFrames(stream, AE->bufferSize);
+    }
     return AAUDIO_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -60,13 +72,24 @@ aaudio_result_t AudioEngine::CreateAndOpenStream() {
     AAudioStreamBuilder_setDirection(builder, AAUDIO_DIRECTION_OUTPUT);
     AAudioStreamBuilder_setSharingMode(builder, AAUDIO_SHARING_MODE_SHARED);
     AAudioStreamBuilder_setSampleRate(builder, sampleRate);
-    AAudioStreamBuilder_setBufferCapacityInFrames(builder, BufferCapacityInFrames*4096);
+    AAudioStreamBuilder_setBufferCapacityInFrames(builder, BufferCapacityInFrames);
     AAudioStreamBuilder_setChannelCount(builder, channelCount);
     AAudioStreamBuilder_setFormat(builder, AAUDIO_FORMAT_PCM_I16);
-    AAudioStreamBuilder_setDataCallback(builder, onAudioReady, nullptr);
-    AAudioStreamBuilder_setErrorCallback(builder, onError, nullptr);
+    AAudioStreamBuilder_setDataCallback(builder, onAudioReady, this);
+    AAudioStreamBuilder_setErrorCallback(builder, onError, this);
     AAudioStreamBuilder_setPerformanceMode(builder, AAUDIO_PERFORMANCE_MODE_LOW_LATENCY);
     result = AAudioStreamBuilder_openStream(builder, &stream);
+
+    underrunCount = 0;
+    previousUnderrunCount = 0;
+    framesPerBurst = AAudioStream_getFramesPerBurst(stream);
+    bufferSize = AAudioStream_getBufferSizeInFrames(stream);
+    bufferCapacity = AAudioStream_getBufferCapacityInFrames(stream);
+    underrunMonitor.add("underrunCount", &underrunCount);
+    underrunMonitor.add("previousUnderrunCount", &previousUnderrunCount);
+    underrunMonitor.add("framesPerBurst", &framesPerBurst);
+    underrunMonitor.add("bufferSize", &bufferSize);
+    underrunMonitor.add("bufferCapacity", &bufferCapacity);
     return result;
 }
 

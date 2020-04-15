@@ -1,19 +1,75 @@
 package general.code.audiotester
 
-import android.content.Context
-import android.content.res.AssetManager
-import android.media.AudioManager
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
+import android.os.Handler
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.io.*
+import androidx.core.view.doOnPreDraw
+import liblayout.Builder
 
 class MainActivity : AppCompatActivity() {
     var player: MP? = null
+    lateinit var underruns: TextView
+    lateinit var previousunderruns: TextView
+    lateinit var framesperburst: TextView
+    lateinit var buffersize: TextView
+    lateinit var buffercapacity: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Builder(this)
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "underruns: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "underruns: ${player!!.Oboe_underrunCount()}"
+                    }
+                }
+            }
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "previous underruns: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "previous underruns: ${player!!.Oboe_previousUnderrunCount()}"
+                    }
+                }
+            }
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "frames per burst: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "frames per burst: ${player!!.Oboe_framesPerBurst()}"
+                    }
+                }
+            }
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "buffer size: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "buffer size: ${player!!.Oboe_bufferSize()}"
+                    }
+                }
+            }
+            .row().column {
+                UpdatingTextView(this).also {
+                    it.addOnFirstDrawAction {
+                        it.text = "buffer capacity: 0"
+                    }
+                    it.addOnDrawAction {
+                        it.text = "buffer capacity: ${player!!.Oboe_bufferCapacity()}"
+                    }
+                }
+            }
+        .build()
 
         // load Player
 
@@ -39,6 +95,10 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         player!!.play()
+    }
+
+    override fun onStop() {
+        super.onStop()
     }
 
     override fun onDestroy() {
