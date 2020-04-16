@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
         .build()
 
         // load Player

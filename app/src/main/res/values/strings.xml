@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">AudioTester</string>
+    <string name="app_name_debug">AT (Debug)</string>
+    <string name="app_name_release">AT (Release)</string>
 </resources>

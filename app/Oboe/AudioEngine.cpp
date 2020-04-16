@@ -20,7 +20,6 @@ aaudio_data_callback_result_t AudioEngine::onAudioReady(
 
     // Are we getting underruns?
     int32_t tmpuc = AAudioStream_getXRunCount(stream);
-    LOGE("UNDERRUN COUNT: %d", tmpuc);
     if (tmpuc > AE->previousUnderrunCount) {
         AE->previousUnderrunCount = AE->underrunCount;
         AE->underrunCount = tmpuc;
@@ -67,6 +66,8 @@ aaudio_result_t AudioEngine::CreateAndOpenStream() {
     }
 
 //    https://developer.android.com/ndk/guides/audio/aaudio/aaudio#tuning-buffers
+//    https://github.com/yse/easy_profiler
+//          Now with build-in profiler ther is no point to use it ... You will get almost same info
 
     AAudioStreamBuilder_setDeviceId(builder, 0);
     AAudioStreamBuilder_setDirection(builder, AAUDIO_DIRECTION_OUTPUT);

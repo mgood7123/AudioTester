@@ -38,12 +38,9 @@ void SoundRecording::renderAudio(int16_t *targetData, int64_t totalFrames, Sound
             mIsPlaying = false;
         }
 
-//        LOGW("SoundRecording::renderAudio: rendering %ld frames with data", totalFrames);
-
         if (mReadFrameIndex == 0) {
             GlobalTime.StartOfFile = true;
             GlobalTime.update(mReadFrameIndex, AudioData);
-//            LOGW("SoundRecording::renderAudio: AudioTime in milliseconds = %lld", GlobalTime.milliseconds);
         }
         for (int i = 0; i < totalFrames; ++i) {
             for (int j = 0; j < AudioData->channelCount; ++j) {
@@ -57,8 +54,6 @@ void SoundRecording::renderAudio(int16_t *targetData, int64_t totalFrames, Sound
             } else {
                 GlobalTime.update(mReadFrameIndex, AudioData);
             }
-//            LOGW("SoundRecording::renderAudio: mReadFrameIndex = %ld", mReadFrameIndex);
-//            LOGW("SoundRecording::renderAudio: AudioTime in milliseconds = %lld", GlobalTime.milliseconds);
         }
     } else {
 //        LOGW("SoundRecording::renderAudio: rendering %d frames with zero", totalFrames);
